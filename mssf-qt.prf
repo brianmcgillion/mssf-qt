@@ -1,0 +1,15 @@
+MSSF_PREFIX=/usr
+MSSF_INCLUDE=/usr/include
+MSSF_LIB=/usr/lib
+
+LIBS += -L$${MSSF_LIB}
+
+contains(MSSF, crypto) {
+    INCLUDEPATH += $${MSSF_INCLUDE}/MssfCryptoQt
+    qtAddLibrary(MssfCryptoQt)
+}
+
+contains(MSSF, creds2) {
+    INCLUDEPATH += $${MSSF_INCLUDE}/MssfCreds2Qt
+    qtAddLibrary(MssfCredsQt)
+}
