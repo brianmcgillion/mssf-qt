@@ -27,6 +27,7 @@
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
+#include <QtCore/QtGlobal>
 
 class MssfCrypto
 {
@@ -64,6 +65,14 @@ public:
       * \brief Destructor
       */
     ~MssfCrypto();
+
+    /*!
+      * \brief Initialize the underlying crypto framework.
+      * \returns true on success, false otherwise.
+      * Although not strictly required to call this method, it would be best to explicetidly call
+      * this method to catch any errors as early as possible.
+      */
+    bool initialize();
 
     /*!
       * \brief Return the last error that occured.
@@ -133,6 +142,69 @@ public:
       * \sa MssfCrypto::SignatureFormat
       */
     bool signData(const QByteArray &data, const char *token, QByteArray &signatureOut, MssfCrypto::SignatureFormat format = base64);
+
+    /*!
+      * \brief Verify That a signature is valid for a given piece of data.
+      * \param signature The signature to verify.
+      * \param data The data that the signature is computed over.
+      * \param createdMode Used to determine the mode in which the signature was created. \sa MssfCrypto::SystemMode
+      * \returns true on success, false otherwise.  If the created mode is Open then true can only be used as a guide line.
+      */
+    bool verifySignature(const QByteArray &signature, const QByteArray &data, MssfCrypto::SystemMode *createdMode);
+
+    /*!
+      * \brief Encrypt the clear text and use the optional token for reference.
+      * \param data The origional message that is to be encrypted.
+      * \param token The optional token to use for referencing the encrypted data.
+      * \returns The encrypted data on success or an empty QByteArray() on failure.
+      */
+    QByteArray encryptData(const QByteArray &data, const char *token);
+
+    /*!
+      * \brief decrypt a given message using an optional token as reference
+      * \param data The encrypted message that is to be decoded.
+      * \param token An optional token to use as a reference
+      * \returns The deciphered data on success, an empty QByteArray() on failure.
+      */
+    QByteArray decryptData(const QByteArray &data, const char *token);
+
+    /*!
+      * \brief Create an array of random data.
+      * \param size The number of random bytes required.
+      * \returns The random array.
+      */
+    QByteArray random(quintptr size);
+
+    /*!
+     * \brief Verify that the given directory is an MSSFFS mountpoint
+     * \param dir Name of the directory
+     * \param mode On ouput, the variable tells in which mode
+     *             the security framework is on. If the mode
+     *             is open, take the result with a grain of salt.
+     * \returns true on success, false otherwise
+     *
+     * Use this function to verify that a directory is mounted by
+     * the MSSFFS cryptofilesystem. If the result is positive and
+     * the returned mode is protected, you should be good to go.
+     * Otherwise you might want to reconsider whether you want to
+     * store sensitive data in this directory or rely on the
+     * integrity of its contents.
+     *
+     * This function can be used for all types of mssffs mountpoints
+     * regardless of their type and access rights.
+     */
+    bool verifyMssffs(const QString &dir, MssfCrypto::SystemMode *mode);
+
+    /*!
+     * \brief Verify that the given directory is an MSSFFS mountpoint
+     * \param dir Name of the directory
+     * \param mode On ouput, the variable tells in which mode
+     *             the security framework is on. If the mode
+     *             is open, take the result with a grain of salt.
+     * \returns true on success, false otherwise
+     * This overladed method is provided for convenience.
+     */
+    bool verifyMssffs(const char *dir, MssfCrypto::SystemMode *mode);
 };
 
 #endif // MSSFCRYPTO_H
