@@ -4,16 +4,26 @@ TEMPLATE = lib
 include(../common.pri)
 
 CONFIG += link_pkconfig
-PKGCONFIG += mssf-crypto
+
+maemo {
+    message("Using Aegis, (AKA V1)")
+    PKGCONFIG += aegis-crypto
+ } else {
+    message("Using Mssf V2")
+    PKGCONFIG += mssf-crypto
+ }
 
 SOURCES += \
     mssfcrypto.cpp \
-    mssfstorage.cpp
+    mssfstorage.cpp \
+    protectedfile.cpp
 
 HEADERS +=\
     mssfcrypto.h \
     MssfCrypto \
     mssfstorage.h \
-    MssfStorage
+    MssfStorage \
+    protectedfile.h \
+    ProtectedFile
 
 include(../install.pri)

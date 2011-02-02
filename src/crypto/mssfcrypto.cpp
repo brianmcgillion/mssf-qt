@@ -22,10 +22,39 @@
 
 #include "mssfcrypto.h"
 
-#include <mssf_crypto.h>
 #include <string>
 
 #include <QtCore/QLatin1String>
+
+#ifdef MAEMO
+#include <aegis_crypto.h>
+#define mssf_application_id aegis_application_id
+#define mssf_application_id_of_bin aegis_application_id_of_bin
+#define mssf_as_base64 aegis_as_base64
+#define mssf_as_hexstring aegis_as_hexstring
+#define mssf_crypto_decrypt aegis_crypto_decrypt
+#define mssf_crypto_encrypt aegis_crypto_encrypt
+#define mssf_crypto_finish aegis_crypto_finish
+#define mssf_crypto_free aegis_crypto_free
+#define mssf_crypto_init aegis_crypto_init
+#define mssf_crypto_last_error_str aegis_crypto_last_error_str
+#define mssf_crypto_ok aegis_crypto_ok
+#define mssf_crypto_random aegis_crypto_random
+#define mssf_crypto_sign aegis_crypto_sign
+#define mssf_crypto_string_to_signature aegis_crypto_string_to_signature
+#define mssf_crypto_verify_mssffs aegis_crypto_verify_aegisfs
+#define mssf_current_mode aegis_current_mode
+#define mssf_signature_t aegis_signature_t
+#define mssf_sysinvariant_t aegis_sysinvariant_t
+#define mssf_system_mode_t aegis_system_mode_t
+#define mssf_system_open aegis_system_open
+#define mssf_system_protected aegis_system_protected
+#else
+#include <mssf_crypto.h>
+#endif
+
+
+
 
 MssfCrypto::MssfCrypto()
 {
@@ -180,6 +209,13 @@ QByteArray MssfCrypto::random(quintptr size)
     QByteArray bytes(size, 0);
     mssf_crypto_random(bytes.data(), size);
     return bytes;
+}
+
+QString MssfCrypto::systemInvariant(MssfCrypto::SystemInvariant invariant)
+{
+    //TODO fix this when more invariants are added
+    Q_UNUSED(invariant)
+    QLatin1String(mssf_system_invariant(sysinvariant_imei));
 }
 
 bool MssfCrypto::verifyMssffs(const QString &dir, MssfCrypto::SystemMode *mode)

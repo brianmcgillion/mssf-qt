@@ -45,8 +45,8 @@ public:
      * "Protected" means that the system integrity is guaranteed.
      */
     enum SystemMode {
-        SystemOpen,      /*!< SystemOpen      - Integrity cannot be guaranteed */
-        SystemProtected  /*!< SystemProtected - Integrity should be guaranteed */
+        SystemOpen,         /*!< SystemOpen      - Integrity cannot be guaranteed */
+        SystemProtected     /*!< SystemProtected - Integrity should be guaranteed */
     };
 
     /*!
@@ -54,8 +54,17 @@ public:
      * \brief The format to use for the data signatures.
      */
     enum SignatureFormat {
-        hexString,      /*!< hexString      - Use a hex string, characters 0-9, a-f */
-        base64          /*!< base64         - Use base 64 encoding. */
+        hexString,          /*!< hexString      - Use a hex string, characters 0-9, a-f */
+        base64              /*!< base64         - Use base 64 encoding. */
+    };
+
+    /*!
+      * \enum mssf_sysinvariant_t
+      * \brief Supported system invariants
+      * These are system wide constant values that are not supposed to change uncontrollably.
+      */
+    enum SystemInvariant {
+        sysIMEI             /*!< IMEI           - The IMEI code of the device. */
     };
 
     /*!
@@ -176,6 +185,12 @@ public:
       * \returns The random array.
       */
     QByteArray random(quintptr size);
+
+    /*!
+      * \brief Query the value of a given system invariant
+      * \returns The value of the invariant.
+      */
+    QString systemInvariant(MssfCrypto::SystemInvariant invariant);
 
     /*!
      * \brief Verify that the given directory is an MSSFFS mountpoint
