@@ -23,13 +23,15 @@
 #ifndef MSSFCRYPTO_H
 #define MSSFCRYPTO_H
 
+#include "mssf-qt_global.h"
+
 #include <unistd.h>
 
 #include <QtCore/QString>
 #include <QtCore/QByteArray>
 #include <QtCore/QtGlobal>
 
-class MssfCrypto
+class MSSFQTSHARED_EXPORT MssfCrypto
 {
 
 public:

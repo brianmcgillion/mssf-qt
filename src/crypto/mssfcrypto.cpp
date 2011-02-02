@@ -177,12 +177,9 @@ QByteArray MssfCrypto::decryptData(const QByteArray &cipherText, const char *tok
 
 QByteArray MssfCrypto::random(quintptr size)
 {
-    RAWDATA_PTR bytes = NULL;
-    size_t length = mssf_crypto_random(&bytes, size);
-
-    QByteArray data((char *)bytes, length);
-    mssf_crypto_free(bytes);
-    return data;
+    QByteArray bytes(size, 0);
+    mssf_crypto_random(bytes.data(), size);
+    return bytes;
 }
 
 bool MssfCrypto::verifyMssffs(const QString &dir, MssfCrypto::SystemMode *mode)

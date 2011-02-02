@@ -7,10 +7,13 @@ CONFIG += link_pkconfig
 PKGCONFIG += mssf-crypto
 
 SOURCES += \
-    mssfcrypto.cpp
+    mssfcrypto.cpp \
+    mssfstorage.cpp
 
 HEADERS +=\
     mssfcrypto.h \
-    MssfCrypto
+    MssfCrypto \
+    mssfstorage.h \
+    MssfStorage
 
 include(../install.pri)
