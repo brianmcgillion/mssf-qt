@@ -29,7 +29,12 @@
 
 #include <unistd.h>
 #include <sys/types.h>
+
+#ifdef MAEMO
 #include <sys/creds.h>
+#else
+#include <creds.h>
+#endif
 
 class MSSFQTSHARED_EXPORT CredentialsManager
 {
@@ -46,11 +51,26 @@ public:
     virtual ~CredentialsManager();
 
     /*!
-      * \brief Determine if a process has the required credentials.
+      * \brief Determine if a process has the required credential and the correct access type.
+      * \param clientPID The process id of the process, if 0 then the credentials of the current process will be checked.
+      * \param credential The credential that the process must possess.
+      * \param access The access type requested to the object.
+      * \param errorString An empty string that will be populated with the most recent error if this method returns false.
+      * \returns true if the client has the required credential, false otherwise.
+      *
+      * Examples of access_type valid strings: "r", "w", "rw", "a", "ra", "wa", "x", "rwx", and etc.
+      * If an empty string is supplied, then access is assumed to be "rw".
+      */
+    static bool hasProcessCredential(pid_t clientPID, const QString &credential, const QString &access, QString *errorString = NULL);
+
+    /*!
+      * \brief Determine if a process has the required credentials, overloaded for convenience.
       * \param clientPID The process id of the process, if 0 then the credentials of the current process will be checked.
       * \param credential The credential that the process must possess.
       * \param errorString An empty string that will be populated with the most recent error if this method returns false.
       * \returns true if the client has the required credential, false otherwise.
+      *
+      * In Mssf V2 this method assumes checking 'rw' access with the token, in V1 possession of the token is sufficient to grant all access.
       */
     static bool hasProcessCredential(pid_t clientPID, const QString &credential, QString *errorString = NULL);
 
@@ -58,8 +78,23 @@ public:
       * \brief Determine if a socket has the required credentials.
       * \param socketId The id of the socket.
       * \param credential The credential that the socket must possess.
+      * \param access The access type requested to the object.
       * \param errorString An empty string that will be populated with the most recent error if this method returns false.
       * \returns true if the client has the required credential, false otherwise.
+      *
+      * Examples of access_type valid strings: "r", "w", "rw", "a", "ra", "wa", "x", "rwx", and etc.
+      * If an empty string is supplied, then access is assumed to be "rw".
+      */
+    static bool hasSocketCredential(int socketId, const QString &credential, const QString &access, QString *errorString = NULL);
+
+    /*!
+      * \brief Determine if a socket has the required credentials.
+      * \param socketId The id of the socket.
+      * \param credential The credential that the socket must possess.
+      * \param errorString An empty string that will be populated with the most recent error if this method returns false.
+      * \returns true if the client has the required credential, false otherwise.
+      *
+      * In Mssf V2 this method assumes checking 'rw' access with the token, in V1 possession of the token is sufficient to grant all access.
       */
     static bool hasSocketCredential(int socketId, const QString &credential, QString *errorString = NULL);
 
@@ -69,10 +104,11 @@ private:
       * \brief Determine if a given credential list contains the required credential
       * \param creds The credentials structure to search, (this will be freed upon return)
       * \param credential The credential that the socket must possess.
+      * \param access The access type requested to the object.
       * \param errorString An empty string that will be populated with the most recent error if this method returns false.
       * \returns true if the creds has the required credential, false otherwise.
       */
-    static bool hasCredential(creds_t creds, const QString &credential, QString *errorString);
+    static bool hasCredential(creds_t creds, const QString &credential, const QString &access, QString *errorString);
 
     /*!
       * \brief Set the error string for the applciation.

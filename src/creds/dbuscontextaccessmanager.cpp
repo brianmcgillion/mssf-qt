@@ -37,9 +37,25 @@ DBusContextAccessManager::~DBusContextAccessManager()
 
 }
 
+bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, const QString &access, QString *errorString)
+{
+    return CredentialsManager::hasProcessCredential(getClientPID(context), credential, access, errorString);
+}
+
 bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, QString *errorString)
 {
     return CredentialsManager::hasProcessCredential(getClientPID(context), credential, errorString);
+}
+
+quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &context)
+{
+    QString serviceName = context.message().service();
+    QDBusReply<quint32 *> reply;
+    reply = context.connection().interface()->call(QLatin1String("GetConnectionUnixCredentials"), serviceName);
+    if (!context.connection().interface()->lastError().isValid())
+        return 0;
+
+    return reply.value();
 }
 
 pid_t DBusContextAccessManager::getClientPID(const QDBusContext &context)
@@ -53,3 +69,5 @@ uid_t DBusContextAccessManager::getClientUID(const QDBusContext &context)
     QString serviceName = context.message().service();
     return context.connection().interface()->serviceUid(serviceName).value();
 }
+
+Q_DECLARE_METATYPE(quint32 *)

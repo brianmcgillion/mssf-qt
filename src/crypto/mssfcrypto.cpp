@@ -49,11 +49,12 @@
 #define mssf_system_mode_t aegis_system_mode_t
 #define mssf_system_open aegis_system_open
 #define mssf_system_protected aegis_system_protected
+#define mssf_crypto_signature_to_string aegis_crypto_signature_to_string
+#define mssf_crypto_verify aegis_crypto_verify
+#define mssf_system_invariant aegis_system_invariant
 #else
 #include <mssf_crypto.h>
 #endif
-
-
 
 
 MssfCrypto::MssfCrypto()

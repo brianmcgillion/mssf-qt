@@ -9,7 +9,7 @@ contains(MSSF, crypto) {
     qtAddLibrary(MssfCryptoQt)
 }
 
-contains(MSSF, creds2) {
-    INCLUDEPATH += $${MSSF_INCLUDE}/MssfCreds2Qt
+contains(MSSF, creds) {
+    INCLUDEPATH += $${MSSF_INCLUDE}/MssfCredsQt
     qtAddLibrary(MssfCredsQt)
 }

@@ -33,7 +33,7 @@ CredentialsManager::~CredentialsManager()
 {
 }
 
-bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &credential, QString *errorString)
+bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &credential, const QString &access, QString *errorString)
 {
     creds_t creds;
     char strErrArray[256];
@@ -46,10 +46,15 @@ bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &cr
                                                 errorString);
     }
 
-    return CredentialsManager::hasCredential(creds, credential, errorString);
+    return CredentialsManager::hasCredential(creds, credential, access, errorString);
 }
 
-bool CredentialsManager::hasSocketCredential(int socketId, const QString &credential, QString *errorString)
+bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &credential, QString *errorString)
+{
+    return hasProcessCredential(clientPID, credential, QString(), errorString);
+}
+
+bool CredentialsManager::hasSocketCredential(int socketId, const QString &credential, const QString &access, QString *errorString)
 {
     creds_t creds;
     char strErrArray[256];
@@ -62,10 +67,15 @@ bool CredentialsManager::hasSocketCredential(int socketId, const QString &creden
                                                 errorString);
     }
 
-    return CredentialsManager::hasCredential(creds, credential, errorString);
+    return CredentialsManager::hasCredential(creds, credential, access, errorString);
 }
 
-bool CredentialsManager::hasCredential(creds_t creds, const QString &credential, QString *errorString)
+bool CredentialsManager::hasSocketCredential(int socketId, const QString &credential, QString *errorString)
+{
+    return hasSocketCredential(socketId, credential, QString(), errorString);
+}
+
+bool CredentialsManager::hasCredential(creds_t creds, const QString &credential, const QString &access, QString *errorString)
 {
     creds_type_t type;
     creds_value_t value;
@@ -80,7 +90,7 @@ bool CredentialsManager::hasCredential(creds_t creds, const QString &credential,
                                                 errorString);
     }
 
-    bool hasCredential = creds_have_p(creds, type, value);
+    bool hasCredential = creds_have_access(creds, type, value, access.toUtf8().constData());
     if (!hasCredential)
         CredentialsManager::setLastError("Entity does not possess required credential", errorString);
 
