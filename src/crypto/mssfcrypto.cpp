@@ -216,7 +216,7 @@ QString MssfCrypto::systemInvariant(MssfCrypto::SystemInvariant invariant)
 {
     //TODO fix this when more invariants are added
     Q_UNUSED(invariant)
-    QLatin1String(mssf_system_invariant(sysinvariant_imei));
+    return QLatin1String(mssf_system_invariant(sysinvariant_imei));
 }
 
 bool MssfCrypto::verifyMssffs(const QString &dir, MssfCrypto::SystemMode *mode)
