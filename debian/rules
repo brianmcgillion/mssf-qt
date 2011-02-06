@@ -1,0 +1,33 @@
+#!/usr/bin/make -f
+
+PKGVERSION      := $(shell dpkg-parsechangelog | grep ^Version:.* | cut -d ' ' -f 2)
+include /usr/share/cdbs/1/rules/debhelper.mk
+include /usr/share/cdbs/1/class/qmake.mk
+
+CXXFLAGS = -Wall -g -fPIC -Werror
+configs += maemo
+
+ifneq (,$(findstring noopt,$(DEB_BUILD_OPTIONS)))
+        CXXFLAGS += -O0
+else
+        CXXFLAGS += -O2
+endif
+
+ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
+        CXXFLAGS += -ggdb
+        configs += debug
+else
+        configs += release
+endif
+
+MAKEBUILDDIR_TARGETS := $(foreach pkg,$(DEB_ALL_PACKAGES),makebuilddir/$(pkg))
+
+clean::
+	-rm debian/configure-stamp
+
+$(MAKEBUILDDIR_TARGETS):: debian/configure-stamp
+
+debian/configure-stamp:
+	[ ! -f Makefile ] || $(MAKE) distclean
+	qmake -recursive -spec linux-g++ CONFIG+="$(configs)" DEFINES+="$(defines)" QMAKE_CXXFLAGS+="$(CXXFLAGS)" VERSION=$(PKGVERSION) $(QMAKE_OPTIONS)
+	touch $@
