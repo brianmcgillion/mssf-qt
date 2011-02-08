@@ -2,7 +2,7 @@ Source: mssf-qt
 Section: libs
 Priority: extra
 Maintainer: Brian McGillion <brian.mcgillion@symbio.com>
-Build-Depends: cdbs, debhelper (>= 7.0), libaegis-crypto-dev, libcreds2-dev, doxygen
+Build-Depends: cdbs, debhelper (>= 7.0), libqt4-dev, libaegis-crypto-dev, libcreds2-dev, doxygen
 Standards-Version: 3.8.4
 Vcs-Git: http://git.gitorious.org/meego-platform-security/mssf-qt.git
 Vcs-Browser: http://meego.gitorious.org/meego-platform-security/mssf-qt
