@@ -9,7 +9,7 @@ Vcs-Browser: http://meego.gitorious.org/meego-platform-security/mssf-qt
 
 Package: mssf-qt
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, aegis-crypto, libcreds2
+Depends: ${shlibs:Depends}, ${misc:Depends}, libaegis-crypto1, libcreds2, libaegis-certman0
 Description: Qt Wrapper for MSSF components
  Wrap a number of Mssf libraries with Qt API.
 
