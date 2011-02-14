@@ -16,7 +16,7 @@ Description: Qt Wrapper for MSSF components
 Package: mssf-qt-dev
 Section: libdevel
 Architecture: any
-Depends: mssf-qt (=${binary:Version}), libaegis-crypto-dev, libcreds2-dev
+Depends: mssf-qt (=${binary:Version})
 Description: Development files for mssf-qt.
  Shared headers and libraries for developmnet with mssf-qt.
 

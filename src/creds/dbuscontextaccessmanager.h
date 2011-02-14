@@ -25,11 +25,14 @@
 
 #include "mssf-qt_global.h"
 
-#include <QDBusContext>
-#include <QtCore/QString>
-
 #include <unistd.h>
 #include <sys/types.h>
+
+class QDBusContext;
+class QString;
+
+namespace MssfQt
+{
 
 class MSSFQTSHARED_EXPORT DBusContextAccessManager
 {
@@ -96,5 +99,7 @@ public:
       */
     static uid_t getClientUID(const QDBusContext &context);
 };
+
+} //namespace MssfQt
 
 #endif // LIBCREDSQT_H

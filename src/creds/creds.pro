@@ -16,10 +16,12 @@ SOURCES += \
     dbuscontextaccessmanager.cpp \
     credentialsmanager.cpp
 
-HEADERS +=\
+PUBLIC_HEADERS +=\
     dbuscontextaccessmanager.h \
     credentialsmanager.h \
     DBusContextAccessManager \
     CredentialsManager
+
+HEADERS += $$PUBLIC_HEADERS
 
 include(../install.pri)

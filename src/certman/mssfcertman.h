@@ -25,6 +25,9 @@
 
 #include "mssf-qt_global.h"
 
+namespace MssfQt
+{
+
 class MSSFQTSHARED_EXPORT MssfCertman
 {
 
@@ -44,4 +47,5 @@ public:
     MssfCertman();
 };
 
+} //namespace MssfQt
 #endif // MSSFCERTMAN_H

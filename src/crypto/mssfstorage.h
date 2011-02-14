@@ -25,29 +25,25 @@
 
 #include "mssf-qt_global.h"
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QtCore/QByteArray>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#ifdef MAEMO
-namespace aegis {
-    class storage;
-}
-#else
-namespace mssf {
-    class storage;
-}
-#endif
+#include <QtCore/QScopedPointer>
+#include <QtCore/QString>
+
+class QStringList;
+class QByteArray;
+
+namespace MssfQt
+{
 
 class ProtectedFile;
+class MssfStoragePrivate;
 
 class MSSFQTSHARED_EXPORT MssfStorage
 {
-    friend class ProtectedFile;
+    friend class ProtectedFilePrivate;
 
 public:
 
@@ -244,7 +240,7 @@ public:
       *
       * Using this function will easily result in a race condition,
       * if the file is opened and read later. It is safer
-      * to use \ref getFile or the \ref member function to
+      * to use \ref getFile or the \re#include "mssfstorage_p.h"f member function to
       * return a p_open instance which allows reading the
       * file contents without a race.
       */
@@ -308,14 +304,14 @@ public:
 //                             void* ctx);
 
 private:
-    //! The storage class that is being wrapped.
-    #ifdef MAEMO
-        MssfStorage(aegis::storage *store);
-        aegis::storage *store;
-    #else
-        MssfStorage(mssf::storage *store);
-        mssf::storage *store;
-    #endif
+    /*!
+      * \brief Overlaoded Constructor
+      */
+    MssfStorage(MssfStoragePrivate *other);
+    //! internal private implementation
+    QScopedPointer<MssfStoragePrivate> d_ptr;
 };
+
+} //namespace MssfQt
 
 #endif // MSSFSTORAGE_H

@@ -25,6 +25,64 @@
 #include <string.h>
 #include <errno.h>
 
+#include <QtCore/QString>
+
+#ifdef MAEMO
+#include <sys/creds.h>
+#else
+#include <creds.h>
+#endif
+
+using namespace MssfQt;
+
+/*!
+  * \brief Set the error string for the applciation.
+  * \param errorStr The latest error string.
+  * \param returnString The error string to be returned
+  * \returns false This is a convenience so that we can just "return setLastError("Bla")"
+  */
+static bool setLastError(const QString &errorStr, QString *returnString)
+{
+    if (!returnString)
+        return false;
+
+    returnString->clear();
+    returnString->append(errorStr);
+    return false;
+}
+
+/*!
+  * \brief Determine if a given credential list contains the required credential
+  * \param creds The credentials structure to search, (this will be freed upon return)
+  * \param credential The credential that the socket must possess.
+  * \param access The access type requested to the object.
+  * \param errorString An empty string that will be populated with the most recent error if this method returns false.
+  * \returns true if the creds has the required credential, false otherwise.
+  */
+static bool hasCredential(creds_t creds, const QString &credential, const QString &access, QString *errorString)
+{
+    creds_type_t type;
+    creds_value_t value;
+    char strErrArray[256];
+
+    if ((type = creds_str2creds(credential.toUtf8().data(), &value)) == CREDS_BAD)
+    {
+        creds_free(creds);
+        return setLastError(QString("Invalid credential string (%1), errno (%2) : %3")
+                            .arg(credential).arg(errno).arg(
+                                strerror_r(errno, strErrArray, sizeof(strErrArray))),
+                            errorString);
+    }
+
+    bool hasCredential = creds_have_access(creds, type, value, access.toUtf8().constData());
+    if (!hasCredential)
+        setLastError("Entity does not possess required credential", errorString);
+
+    creds_free(creds);
+
+    return hasCredential;
+}
+
 CredentialsManager::CredentialsManager()
 {
 }
@@ -40,13 +98,13 @@ bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &cr
 
     if ((creds = creds_gettask(clientPID)) == NULL)
     {
-        return CredentialsManager::setLastError(QString("Failed to find credentials for process (%1), errno (%2) : %3")
-                                                .arg((int)clientPID).arg(errno).arg(
-                                                    strerror_r(errno, strErrArray, sizeof(strErrArray))),
-                                                errorString);
+        return setLastError(QString("Failed to find credentials for process (%1), errno (%2) : %3")
+                            .arg((int)clientPID).arg(errno).arg(
+                                strerror_r(errno, strErrArray, sizeof(strErrArray))),
+                            errorString);
     }
 
-    return CredentialsManager::hasCredential(creds, credential, access, errorString);
+    return hasCredential(creds, credential, access, errorString);
 }
 
 bool CredentialsManager::hasProcessCredential(pid_t clientPID, const QString &credential, QString *errorString)
@@ -61,50 +119,16 @@ bool CredentialsManager::hasSocketCredential(int socketId, const QString &creden
 
     if ((creds = creds_getpeer(socketId)) == NULL)
     {
-        return CredentialsManager::setLastError(QString("Failed to find credentials for socket (%1), errno (%2) : %3")
-                                                .arg(socketId).arg(errno).arg(
-                                                    strerror_r(errno, strErrArray, sizeof(strErrArray))),
-                                                errorString);
+        return setLastError(QString("Failed to find credentials for socket (%1), errno (%2) : %3")
+                            .arg(socketId).arg(errno).arg(
+                                strerror_r(errno, strErrArray, sizeof(strErrArray))),
+                            errorString);
     }
 
-    return CredentialsManager::hasCredential(creds, credential, access, errorString);
+    return hasCredential(creds, credential, access, errorString);
 }
 
 bool CredentialsManager::hasSocketCredential(int socketId, const QString &credential, QString *errorString)
 {
     return hasSocketCredential(socketId, credential, QString(), errorString);
-}
-
-bool CredentialsManager::hasCredential(creds_t creds, const QString &credential, const QString &access, QString *errorString)
-{
-    creds_type_t type;
-    creds_value_t value;
-    char strErrArray[256];
-
-    if ((type = creds_str2creds(credential.toUtf8().data(), &value)) == CREDS_BAD)
-    {
-        creds_free(creds);
-        return CredentialsManager::setLastError(QString("Invalid credential string (%1), errno (%2) : %3")
-                                                .arg(credential).arg(errno).arg(
-                                                    strerror_r(errno, strErrArray, sizeof(strErrArray))),
-                                                errorString);
-    }
-
-    bool hasCredential = creds_have_access(creds, type, value, access.toUtf8().constData());
-    if (!hasCredential)
-        CredentialsManager::setLastError("Entity does not possess required credential", errorString);
-
-    creds_free(creds);
-
-    return hasCredential;
-}
-
-bool CredentialsManager::setLastError(const QString &errorStr, QString *returnString)
-{
-    if (!returnString)
-        return false;
-
-    returnString->clear();
-    returnString->append(errorStr);
-    return false;
 }

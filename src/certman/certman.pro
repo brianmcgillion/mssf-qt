@@ -17,7 +17,8 @@ maemo {
 SOURCES += \
     mssfcertman.cpp
 
-HEADERS +=\
-    mssfcertman.h
+PUBLIC_HEADERS += mssfcertman.h
+
+HEADERS += $$PUBLIC_HEADERS
 
 include(../install.pri)

@@ -3,7 +3,7 @@ MSSF_INCLUDE_PATH = /usr/include/mssf-qt
 
 target.path = $${MSSF_LIB_PATH}
 
-headerfiles.files = $${HEADERS}
+headerfiles.files = $$PUBLIC_HEADERS
 headerfiles.path = $${MSSF_INCLUDE_PATH}
 
 CONFIG += link_pkgconfig create_pc create_prl

@@ -26,7 +26,10 @@
 #include <QDBusMessage>
 #include <QDBusConnection>
 #include <QDBusConnectionInterface>
+#include <QDBusContext>
+#include <QtCore/QString>
 
+using namespace MssfQt;
 
 DBusContextAccessManager::DBusContextAccessManager()
 {

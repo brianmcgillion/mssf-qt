@@ -25,6 +25,9 @@
 #include <string>
 
 #include <QtCore/QLatin1String>
+#include <QtCore/QString>
+#include <QtCore/QByteArray>
+#include <QtCore/QtGlobal>
 
 #ifdef MAEMO
 #include <aegis_crypto.h>
@@ -56,6 +59,7 @@
 #include <mssf_crypto.h>
 #endif
 
+using namespace MssfQt;
 
 MssfCrypto::MssfCrypto()
 {

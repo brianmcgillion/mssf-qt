@@ -3,18 +3,16 @@ MSSF_INCLUDE=/usr/include/mssf-qt
 MSSF_LIB=/usr/lib
 
 LIBS += -L$${MSSF_LIB}
+INCLUDEPATH += $${MSSF_INCLUDE}
 
 contains(MSSF, crypto) {
-    INCLUDEPATH += $${MSSF_INCLUDE}
     qtAddLibrary(MssfCryptoQt)
 }
 
 contains(MSSF, creds) {
-    INCLUDEPATH += $${MSSF_INCLUDE}
     qtAddLibrary(MssfCredsQt)
 }
 
 contains(MSSF, certman) {
-    INCLUDEPATH += $${MSSF_INCLUDE}
     qtAddLibrary(MssfCertManQt)
 }

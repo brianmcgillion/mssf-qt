@@ -27,9 +27,11 @@
 
 #include <unistd.h>
 
-#include <QtCore/QString>
-#include <QtCore/QByteArray>
-#include <QtCore/QtGlobal>
+class QString;
+class QByteArray;
+
+namespace MssfQt
+{
 
 class MSSFQTSHARED_EXPORT MssfCrypto
 {
@@ -223,5 +225,7 @@ public:
      */
     bool verifyMssffs(const char *dir, MssfCrypto::SystemMode *mode);
 };
+
+} //namespace MssfQt
 
 #endif // MSSFCRYPTO_H

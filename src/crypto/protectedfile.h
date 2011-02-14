@@ -26,29 +26,25 @@
 #include "mssf-qt_global.h"
 
 #include <QtCore/QFile>
-#include <QtCore/QByteArray>
-#include <QtCore/QDateTime>
 #include <QtCore/QSharedPointer>
+#include <QtCore/QScopedPointer>
 
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <unistd.h>
 
-#ifdef MAEMO
-namespace aegis {
-class p_file;
-}
-#else
-namespace mssf {
-class p_file;
-}
-#endif
+class QByteArray;
+class QDateTime;
+
+namespace MssfQt
+{
 
 class MssfStorage;
+class MssfStoragePrivate;
+class ProtectedFilePrivate;
 
 class MSSFQTSHARED_EXPORT ProtectedFile
 {
-    friend class MssfStorage;
+    friend class MssfStoragePrivate;
 
 public:
 
@@ -167,25 +163,15 @@ public:
 
 private:
 
-#ifdef MAEMO
     /*!
-      * \brief Constructor private to allow only to reference a file within the storage area
-      * \param file The file that is being accessed
+      * \brief Constructor
+      * \param other The private implementation that is wrapped.
       */
-    ProtectedFile(aegis::p_file *file);
-    //! The protected file that is wrapped
-    aegis::p_file *file;
-#else
-    /*!
-      * \brief Constructor private to allow only to reference a file within the storage area
-      * \param file The file that is being accessed
-      */
-    ProtectedFile(mssf::p_file *file);
-    //! The protected file that is wrapped
-    mssf::p_file *file;
-#endif
+    ProtectedFile(ProtectedFilePrivate *other);
     //! A pointer to the owner of this protected file.
-    QSharedPointer<MssfStorage> ownerPointer;
+    QScopedPointer<ProtectedFilePrivate> d_ptr;
 };
+
+} //MssfQt
 
 #endif // PROTECTEDFILE_H

@@ -52,6 +52,8 @@
 #include <mssf_certman.h>
 #endif
 
+using namespace MssfQt;
+
 MssfCertman::MssfCertman()
 {
 }

@@ -21,10 +21,15 @@
  */
 
 #include "mssfstorage.h"
+#include "mssfstorage_p.h"
 #include "protectedfile.h"
+#include "protectedfile_p.h"
 
 #include <QtCore/QVector>
 #include <QtCore/QRegExp>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QByteArray>
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -44,8 +49,10 @@ using namespace aegis;
 using namespace mssf;
 #endif
 
+using namespace MssfQt;
+
 //Convert to wrapped types
-storage::visibility_t visConverter(MssfStorage::Visibility vis)
+static storage::visibility_t visConverter(MssfStorage::Visibility vis)
 {
     if (vis == MssfStorage::global_vis)
         return storage::vis_global;
@@ -55,7 +62,7 @@ storage::visibility_t visConverter(MssfStorage::Visibility vis)
         return storage::vis_shared;
 }
 
-storage::protection_t protConverter(MssfStorage::Protection prot)
+static storage::protection_t protConverter(MssfStorage::Protection prot)
 {
     if (prot == MssfStorage::Encrypted)
         return storage::prot_encrypted;
@@ -88,36 +95,70 @@ QStringList vectorToStringList(const storage::stringlist &list, const QString &m
 }
 
 MssfStorage::MssfStorage(const QString &name, const QString &owner, MssfStorage::Visibility vis, MssfStorage::Protection prot)
+    : d_ptr(new MssfStoragePrivate(name, owner, vis, prot))
+{
+}
+
+MssfStorage::MssfStorage(MssfStoragePrivate *other)
+    : d_ptr(other)
+{
+}
+
+MssfStoragePrivate::MssfStoragePrivate(const QString &name, const QString &owner, MssfStorage::Visibility vis, MssfStorage::Protection prot)
     : store(new storage(name.toUtf8().constData(), owner.toUtf8().constData(), visConverter(vis), protConverter(prot)))
 {
 }
 
-MssfStorage::MssfStorage(storage *store)
+MssfStoragePrivate::MssfStoragePrivate(storage *store)
     : store(store)
 {
 }
 
 MssfStorage::~MssfStorage()
 {
+}
+
+MssfStoragePrivate::~MssfStoragePrivate()
+{
     delete store; store = NULL;
 }
 
 QString MssfStorage::storageRoot()
+{
+    return MssfStoragePrivate::storageRoot();
+}
+
+QString MssfStoragePrivate::storageRoot()
 {
     return QLatin1String(storage_root());
 }
 
 QString MssfStorage::name() const
 {
+    return d_ptr->name();
+}
+
+QString MssfStoragePrivate::name() const
+{
     return QLatin1String(store->name());
 }
 
 QString MssfStorage::filename() const
 {
+    return d_ptr->filename();
+}
+
+QString MssfStoragePrivate::filename() const
+{
     return QLatin1String(store->filename());
 }
 
 QString MssfStorage::lastError()
+{
+    return d_ptr->lastError();
+}
+
+QString MssfStoragePrivate::lastError()
 {
     char err[256];
     strerror_r(errno, err, 256);
@@ -125,6 +166,11 @@ QString MssfStorage::lastError()
 }
 
 MssfStorage::Visibility MssfStorage::visibility() const
+{
+   return d_ptr->visibility();
+}
+
+MssfStorage::Visibility MssfStoragePrivate::visibility() const
 {
     storage::visibility_t vis = store->visibility();
     if (vis == storage::vis_global)
@@ -137,25 +183,50 @@ MssfStorage::Visibility MssfStorage::visibility() const
 
 MssfStorage::Protection MssfStorage::protection() const
 {
+    return d_ptr->protection();
+}
+
+MssfStorage::Protection MssfStoragePrivate::protection() const
+{
     return (store->protection() == storage::prot_encrypted ? MssfStorage::Encrypted : MssfStorage::Signed);
 }
 
 int MssfStorage::numFiles() const
+{
+    return d_ptr->numFiles();
+}
+
+int MssfStoragePrivate::numFiles() const
 {
     return store->nbrof_files();
 }
 
 int MssfStorage::numLinks() const
 {
+    return d_ptr->numLinks();
+}
+
+int MssfStoragePrivate::numLinks() const
+{
     return store->nbrof_links();
 }
 
 bool MssfStorage::removeAllFiles()
 {
+    return d_ptr->removeAllFiles();
+}
+
+bool MssfStoragePrivate::removeAllFiles()
+{
     return store->remove_all_files();
 }
 
 QStringList MssfStorage::getFiles(const QString &mask)
+{
+    return d_ptr->getFiles(mask);
+}
+
+QStringList MssfStoragePrivate::getFiles(const QString &mask)
 {
     storage::stringlist list;
     size_t total = store->get_files(list);
@@ -170,6 +241,11 @@ QStringList MssfStorage::getFiles(const QString &mask)
 
 QStringList MssfStorage::getUFiles()
 {
+    return d_ptr->getUFiles();
+}
+
+QStringList MssfStoragePrivate::getUFiles()
+{
     storage::stringlist list;
     size_t total = store->get_ufiles(list);
     if (total <= 0)
@@ -183,40 +259,80 @@ QStringList MssfStorage::getUFiles()
 
 bool MssfStorage::containsFile(const QString &pathname)
 {
+    return d_ptr->containsFile(pathname);
+}
+
+bool MssfStoragePrivate::containsFile(const QString &pathname)
+{
     return store->contains_file(pathname.toUtf8().constData());
 }
 
 bool MssfStorage::containsLink(const QString &pathname)
+{
+    return d_ptr->containsLink(pathname);
+}
+
+bool MssfStoragePrivate::containsLink(const QString &pathname)
 {
     return store->contains_link(pathname.toUtf8().constData());
 }
 
 void MssfStorage::addFile(const QString &pathname)
 {
+    d_ptr->addFile(pathname);
+}
+
+void MssfStoragePrivate::addFile(const QString &pathname)
+{
     store->add_file(pathname.toUtf8().constData());
 }
 
 void MssfStorage::removeFile(const QString &pathname)
+{
+    d_ptr->removeFile(pathname);
+}
+
+void MssfStoragePrivate::removeFile(const QString &pathname)
 {
     store->remove_file(pathname.toUtf8().constData());
 }
 
 void MssfStorage::addLink(const QString &pathname, const QString &to)
 {
+    d_ptr->addLink(pathname, to);
+}
+
+void MssfStoragePrivate::addLink(const QString &pathname, const QString &to)
+{
     store->add_link(pathname.toUtf8().constData(), to.toUtf8().constData());
 }
 
 void MssfStorage::removeLink(const QString &pathname)
+{
+    d_ptr->removeLink(pathname);
+}
+
+void MssfStoragePrivate::removeLink(const QString &pathname)
 {
     store->remove_link(pathname.toUtf8().constData());
 }
 
 void MssfStorage::rename(const QString &pathname, const QString &to)
 {
+    d_ptr->rename(pathname, to);
+}
+
+void MssfStoragePrivate::rename(const QString &pathname, const QString &to)
+{
     store->rename(pathname.toUtf8().constData(), to.toUtf8().constData());
 }
 
 QString MssfStorage::readLink(const QString &pathname)
+{
+    return d_ptr->readLink(pathname);
+}
+
+QString MssfStoragePrivate::readLink(const QString &pathname)
 {
     std::string pointsTo;
     store->read_link(pathname.toUtf8().constData(), pointsTo);
@@ -225,15 +341,30 @@ QString MssfStorage::readLink(const QString &pathname)
 
 bool MssfStorage::verifyFile(const QString &pathname)
 {
+    return d_ptr->verifyFile(pathname);
+}
+
+bool MssfStoragePrivate::verifyFile(const QString &pathname)
+{
     return store->verify_file(pathname.toUtf8().constData());
 }
 
 bool MssfStorage::verifyContent(const QString &pathname, const QByteArray &data)
 {
+    return d_ptr->verifyContent(pathname, data);
+}
+
+bool MssfStoragePrivate::verifyContent(const QString &pathname, const QByteArray &data)
+{
     return store->verify_content(pathname.toUtf8().constData(), (uchar *)data.constData(), data.size());
 }
 
 QByteArray MssfStorage::getFile(const QString &pathname)
+{
+    return d_ptr->getFile(pathname);
+}
+
+QByteArray MssfStoragePrivate::getFile(const QString &pathname)
 {
     RAWDATA_PTR storedData = NULL;
     size_t length = 0;
@@ -252,23 +383,43 @@ QByteArray MssfStorage::getFile(const QString &pathname)
 
 bool MssfStorage::putFile(const QString &pathname, const QByteArray &data)
 {
+    return d_ptr->putFile(pathname, data);
+}
+
+bool MssfStoragePrivate::putFile(const QString &pathname, const QByteArray &data)
+{
     return (store->put_file(pathname.toUtf8().constData(), (void *)data.constData(), data.size()) == 0 ? true : false);
 }
 
 void MssfStorage::commit()
+{
+    d_ptr->commit();
+}
+
+void MssfStoragePrivate::commit()
 {
     store->commit();
 }
 
 ProtectedFile* MssfStorage::member(const QString &pathname)
 {
+   return d_ptr->member(pathname);
+}
+
+ProtectedFile* MssfStoragePrivate::member(const QString &pathname)
+{
     p_file *file = store->member(pathname.toUtf8().constData());
     if (!file)
         return NULL;
-    return new ProtectedFile(file);
+    return new ProtectedFile(new ProtectedFilePrivate(file));
 }
 
 bool MssfStorage::statFile(const QString &pathname, struct stat *stbuf)
+{
+    return d_ptr->statFile(pathname, stbuf);
+}
+
+bool MssfStoragePrivate::statFile(const QString &pathname, struct stat *stbuf)
 {
     return (store->stat_file(pathname.toUtf8().constData(), stbuf) == 0 ? true : false);
 }
