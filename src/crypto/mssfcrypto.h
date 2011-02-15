@@ -33,6 +33,9 @@ class QByteArray;
 namespace MssfQt
 {
 
+//! Symbol that is used to separate the data from the signature
+const char Separator = '|';
+
 class MSSFQTSHARED_EXPORT MssfCrypto
 {
 
@@ -115,7 +118,7 @@ public:
       * The application ID differs from teh process name in that it is the unque name that is
       * created by the MSSF framework based on teh package that the binary belongs to.
       */
-    QString applicationId(pid_t pid);
+    static QString applicationId(pid_t pid);
 
     /*!
       * \brief Return the application ID of a particular application.
@@ -123,7 +126,7 @@ public:
       * \returns The application ID if it exists, QString() on error.
       * This is an overloaded method provided for convenience.
       */
-    QString applicationId(const QString &pathName);
+    static QString applicationId(const QString &pathName);
 
     /*!
       * \brief Return the application ID of a particular application.
@@ -131,7 +134,7 @@ public:
       * \returns The application ID if it exists, QString() on error.
       * This is an overloaded method provided for convenience.
       */
-    QString applicationId(const char *pathName);
+    static QString applicationId(const char *pathName);
 
     /*!
      * \brief In what mode the system seems to be in
@@ -157,13 +160,35 @@ public:
     bool signData(const QByteArray &data, const char *token, QByteArray &signatureOut, MssfCrypto::SignatureFormat format = base64);
 
     /*!
+      * \brief Sign some data with a token and append the signature to the end of the returned data.
+      * \param data The data that is to be signed
+      * \param token The NULL terminated name of the token to use, use NULL to specify the current APPLICATION ID.
+      * \param dataAndsignatureOut The original data with the resulting signature appended if successful, QByteArray() otherwise.
+      * \param format The encoding format to use for the signature
+      * \returns true on success, false otherwise.
+      * \sa MssfCrypto::SignatureFormat
+      * \sa MssfCrypto::verifySignatureAndSplit
+      */
+    bool signDataAppended(const QByteArray &data, const char *token, QByteArray &dataAndsignatureOut, MssfCrypto::SignatureFormat format = base64);
+
+    /*!
       * \brief Verify That a signature is valid for a given piece of data.
       * \param signature The signature to verify.
       * \param data The data that the signature is computed over.
-      * \param createdMode Used to determine the mode in which the signature was created. \sa MssfCrypto::SystemMode
+      * \param createdMode (out) Used to determine the mode in which the signature was created. \sa MssfCrypto::SystemMode
       * \returns true on success, false otherwise.  If the created mode is Open then true can only be used as a guide line.
       */
     bool verifySignature(const QByteArray &signature, const QByteArray &data, MssfCrypto::SystemMode *createdMode);
+
+    /*!
+      * \brief Verify That a signature is valid for a given piece of data.
+      * \param dataAndSignature The data combined with the signature to verify.
+      * \param dataOut The data that the signature is computed over.
+      * \param createdMode (out) Used to determine the mode in which the signature was created. \sa MssfCrypto::SystemMode
+      * \returns true on success, false otherwise.  If the created mode is Open then true can only be used as a guide line.
+      * \sa MssfCrypto::signDataAppended
+      */
+    bool verifySignatureAndSplit(const QByteArray &dataAndSignature, QByteArray &dataOut, MssfCrypto::SystemMode *createdMode);
 
     /*!
       * \brief Encrypt the clear text and use the optional token for reference.

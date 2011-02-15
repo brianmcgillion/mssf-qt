@@ -102,7 +102,7 @@ QString MssfCrypto::processName()
 
 QString MssfCrypto::applicationId(pid_t pid)
 {
-    char *ID;
+    char *ID = NULL;
     mssf_application_id(pid, &ID);
 
     QLatin1String appID(ID);
@@ -117,7 +117,10 @@ QString MssfCrypto::applicationId(const QString &pathName)
 
 QString MssfCrypto::applicationId(const char *pathName)
 {
-    char *ID;
+    if (!pathName)
+        return QString();
+
+    char *ID = NULL;
     mssf_application_id_of_bin(pathName, &ID);
 
     QLatin1String appID(ID);
@@ -148,6 +151,20 @@ bool MssfCrypto::signData(const QByteArray &data, const char *token, QByteArray 
     return true;
 }
 
+bool MssfQt::MssfCrypto::signDataAppended(const QByteArray &data, const char *token, QByteArray &dataAndsignatureOut, MssfCrypto::SignatureFormat format)
+{
+    QByteArray signature;
+
+    if (!signData(data, token, signature, format))
+        return false;
+
+    dataAndsignatureOut.clear();
+    dataAndsignatureOut.append(data);
+    dataAndsignatureOut.append(Separator);
+    dataAndsignatureOut.append(signature);
+    return true;
+}
+
 bool MssfCrypto::verifySignature(const QByteArray &signature, const QByteArray &data, MssfCrypto::SystemMode *createdMode)
 {
     mssf_signature_t binarySig;
@@ -166,8 +183,24 @@ bool MssfCrypto::verifySignature(const QByteArray &signature, const QByteArray &
         return false;
     }
 
-    *createdMode = (mode == mssf_system_open ? SystemOpen : SystemProtected);
+    if (createdMode)
+        *createdMode = (mode == mssf_system_open ? SystemOpen : SystemProtected);
+
     mssf_crypto_free(tokenName);
+    return true;
+}
+
+bool MssfQt::MssfCrypto::verifySignatureAndSplit(const QByteArray &dataAndSignature, QByteArray &dataOut, MssfCrypto::SystemMode *createdMode)
+{
+    int sepPosition = dataAndSignature.lastIndexOf(Separator);
+    QByteArray data = dataAndSignature.left(sepPosition);
+    QByteArray signature = dataAndSignature.mid(sepPosition + 1).data();
+
+    if (!verifySignature(signature, data, createdMode))
+        return false;
+
+    dataOut.clear();
+    dataOut.append(data);
     return true;
 }
 
@@ -234,6 +267,7 @@ bool MssfCrypto::verifyMssffs(const char *dir, MssfCrypto::SystemMode *mode)
     if (mssf_crypto_verify_mssffs(dir, &cmode) != mssf_crypto_ok)
         return false;
 
-    *mode = (cmode == mssf_system_open ? SystemOpen : SystemProtected);
+    if (mode)
+        *mode = (cmode == mssf_system_open ? SystemOpen : SystemProtected);
     return true;
 }
