@@ -1,3 +1,9 @@
+mssf-qt (0.0.5) unstable; urgency=low
+
+  * Add debug symbols.
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Thu, 03 Mar 2011 11:45:33 +0200
+
 mssf-qt (0.0.4) unstable; urgency=low
 
   * Numerous fixes and improvements.

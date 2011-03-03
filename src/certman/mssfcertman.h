@@ -1,7 +1,7 @@
 /*
  * This file is part of MSSF
  *
- * Copyright (C) 2011 Nokia Corporation
+ * Copyright (C) 2011 Brian McGillion
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -18,6 +18,9 @@
  * 02110-1301 USA
  *
  * Author: Brian McGillion <brian.mcgillion@symbio.com>
+ *
+ * This is a wrapper library to provide a Qt API.  All rights for the wrapped
+ * libraries remain with their original authors.
  */
 
 #ifndef MSSFCERTMAN_H

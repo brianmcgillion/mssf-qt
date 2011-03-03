@@ -13,6 +13,12 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, libaegis-crypto1, libcreds2, libaeg
 Description: Qt Wrapper for MSSF components
  Wrap a number of Mssf libraries with Qt API.
 
+Package: mssf-qt-dbg
+Section: devel
+Architecture: any
+Depends:  mssf-qt (= ${Source-Version})
+Description: mssf-qt debug symbols
+
 Package: mssf-qt-dev
 Section: libdevel
 Architecture: any
