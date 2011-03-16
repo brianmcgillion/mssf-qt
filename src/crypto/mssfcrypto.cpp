@@ -218,7 +218,7 @@ QByteArray MssfCrypto::encryptData(const QByteArray &clearText, const char *toke
     if (mssf_crypto_encrypt(clearText.data(), clearText.length(), token, &cipherText, &cipherLength) != mssf_crypto_ok)
     {
         mssf_crypto_free(cipherText);
-        return false;
+        return QByteArray();
     }
 
     QByteArray encrypted((char *)cipherText, cipherLength);
@@ -237,7 +237,7 @@ QByteArray MssfCrypto::decryptData(const QByteArray &cipherText, const char *tok
     if (mssf_crypto_decrypt(cipherText.data(), cipherText.length(), token, &clearText, &length) != mssf_crypto_ok)
     {
         mssf_crypto_free(clearText);
-        return false;
+        return QByteArray();
     }
 
     QByteArray decrypted((char *)clearText, length);
