@@ -9,15 +9,17 @@ include /usr/share/cdbs/1/class/qmake.mk
 PKGVERSION      := $(shell dpkg-parsechangelog | grep ^Version:.* | cut -d ' ' -f 2)
 DEB_QMAKE_ARGS += VERSION=$(PKGVERSION)
 
-CXXFLAGS = -Werror
 DEB_QMAKE_CONFIG_VAL += maemo
 
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
-        CXXFLAGS += -ggdb
+	CXXFLAGS = -Werror -ggdb -Wall
         DEB_QMAKE_CONFIG_VAL += debug
+	# cdbs qmake.mk does not handle DEBUG mode properly, so add it manually
+	DEB_QMAKE_ARGS += "QMAKE_CXXFLAGS *= $(CXXFLAGS)"
 else
         DEB_QMAKE_CONFIG_VAL += release
+	CXXFLAGS += -Werror
 endif
 
 ifneq (,$(findstring gcov,$(DEB_BUILD_OPTIONS)))
