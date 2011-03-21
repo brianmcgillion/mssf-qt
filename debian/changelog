@@ -1,3 +1,10 @@
+mssf-qt (0.0.6) unstable; urgency=low
+
+  * Fixes: NB#236399 - mssf-qt fails to build with gcc-4.5 (-Werror).
+  * Fixes: NB#237180 - mssf-qt: package built without compiler optimizations.
+
+ -- Brian McGillion <brian.mcgillion@symbio.com>  Mon, 21 Mar 2011 11:21:40 +0200
+
 mssf-qt (0.0.5) unstable; urgency=low
 
   * Add debug symbols.
