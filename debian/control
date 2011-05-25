@@ -16,19 +16,20 @@ Description: Qt Wrapper for MSSF components
 Package: mssf-qt-dbg
 Section: devel
 Architecture: any
-Depends:  mssf-qt (= ${Source-Version})
+Depends:  mssf-qt (= ${binary:Version}), ${misc:Depends}
 Description: mssf-qt debug symbols
  Debug symbols for mssf-qt
 
 Package: mssf-qt-dev
 Section: libdevel
 Architecture: any
-Depends: mssf-qt (=${binary:Version})
+Depends: mssf-qt (=${binary:Version}), ${misc:Depends}
 Description: Development files for mssf-qt.
  Shared headers and libraries for developmnet with mssf-qt.
 
 Package: mssf-qt-doc
 Section: doc
 Architecture: all
+Depends: ${misc:Depends}
 Description: Mssf-qt documentation.
  Documentation on the use of Mssf-crypto.
