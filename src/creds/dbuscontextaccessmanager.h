@@ -81,7 +81,8 @@ public:
     /*!
       * \brief Determine the calling process's Credentials based on the DBus context.
       * \param context The QDBusContext that is handling the client request.
-      * \returns The credentials of the client DBus connection or 0 if something wrong happened.
+      * \returns The pointer to credentials of the client DBus connection or 0 if something wrong happened. The array is allocated by new
+      *          and has to be deleted. UINT_MAX is the mark of the end in the list.
       * \sa QDBusContext
       */
     static quint32 *getClientCredentials(const QDBusContext &context);

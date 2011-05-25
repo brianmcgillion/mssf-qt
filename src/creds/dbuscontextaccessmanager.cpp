@@ -1,7 +1,7 @@
 /*
  * This file is part of MSSF
  *
- * Copyright (C) 2011 Brian McGillion
+ * Copyright (C) 2011 Brian McGillion, Denis Mingulov
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -17,7 +17,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  *
- * Author: Brian McGillion <brian.mcgillion@symbio.com>
+ * Authors: Brian McGillion <brian.mcgillion@symbio.com>,
+ *          Denis Mingulov <denis.mingulov@symbio.com>
  *
  * This is a wrapper library to provide a Qt API.  All rights for the wrapped
  * libraries remain with their original authors.
@@ -25,12 +26,14 @@
 
 #include "dbuscontextaccessmanager.h"
 #include "credentialsmanager.h"
+#include "credentialsif.h"
 
-#include <QDBusMessage>
-#include <QDBusConnection>
-#include <QDBusConnectionInterface>
-#include <QDBusContext>
+#include <QtDBus/QDBusMessage>
+#include <QtDBus/QDBusConnection>
+#include <QtDBus/QDBusConnectionInterface>
+#include <QtDBus/QDBusContext>
 #include <QtCore/QString>
+#include <QtCore/QScopedPointer>
 
 using namespace MssfQt;
 
@@ -56,12 +59,23 @@ bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, 
 quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &context)
 {
     QString serviceName = context.message().service();
-    QDBusReply<quint32 *> reply;
-    reply = context.connection().interface()->call(QLatin1String("GetConnectionUnixCredentials"), serviceName);
-    if (!context.connection().interface()->lastError().isValid())
+
+    QScopedPointer<CredentialsIf> credsIf(new CredentialsIf());
+    QDBusPendingReply<QList<quint32> > reply;
+    reply = credsIf->getConnectionCredentials(serviceName);
+    reply.waitForFinished();
+    if (!reply.isValid())
         return 0;
 
-    return reply.value();
+    QList<quint32> list = reply.value();
+    // add separator
+    list.append(UINT_MAX);
+
+    quint32 *result = new quint32[list.count()];
+    for(int i = 0; i < list.count(); i++)
+        result[i] = list[i];
+
+    return result;
 }
 
 pid_t DBusContextAccessManager::getClientPID(const QDBusContext &context)
