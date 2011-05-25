@@ -11,6 +11,8 @@ DEB_QMAKE_ARGS += VERSION=$(PKGVERSION)
 
 DEB_QMAKE_CONFIG_VAL += maemo
 
+# by default - do not export anything
+DEB_QMAKE_ARGS += "QMAKE_CXXFLAGS *= -fvisibility=hidden -fvisibility-inlines-hidden"
 
 ifneq (,$(findstring debug,$(DEB_BUILD_OPTIONS)))
 	CXXFLAGS = -Werror -ggdb -Wall
