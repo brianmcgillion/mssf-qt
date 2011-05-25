@@ -60,7 +60,7 @@ quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &cont
 {
     QString serviceName = context.message().service();
 
-    QScopedPointer<CredentialsIf> credsIf(new CredentialsIf());
+    QScopedPointer<Internal::CredentialsIf> credsIf(new Internal::CredentialsIf());
     QDBusPendingReply<QList<quint32> > reply;
     reply = credsIf->getConnectionCredentials(serviceName);
     reply.waitForFinished();

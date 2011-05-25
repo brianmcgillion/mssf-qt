@@ -12,4 +12,12 @@ doc_distclean.depends = doc_clean
 clean.depends += doc_clean
 distclean.depends += doc_distclean
 
+# Install rules
+
+htmldocs.files = ./html/*
+htmldocs.path = /usr/share/doc/mssf-qt-doc/api
+htmldocs.CONFIG += no_check_exist
+
+INSTALLS += htmldocs
+
 QMAKE_EXTRA_TARGETS += dox clean distclean doc_clean doc_distclean

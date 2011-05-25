@@ -31,14 +31,17 @@
 #include <QtCore/QList>
 #include <QtDBus/QtDBus>
 
+namespace MssfQt
+{
+
+namespace Internal
+{
+
 /*!
   * \file credentialsif.h
   * \class CredentialsIf
   * \brief Implementation of a mechanism to allow get credentials over DBus.
   */
-
-namespace MssfQt
-{
 
 class CredentialsIf : public QDBusAbstractInterface
 {
@@ -67,6 +70,8 @@ public Q_SLOTS: // METHODS
     QDBusPendingReply<QList<quint32> > getConnectionCredentials(const QString &service);
 
 };
+
+} // namespace Internal
 
 } // namespace MssfQt
 

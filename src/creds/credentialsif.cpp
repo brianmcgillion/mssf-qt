@@ -28,6 +28,9 @@
 namespace MssfQt
 {
 
+namespace Internal
+{
+
 namespace Constants
 {
     //! DBus service
@@ -56,5 +59,7 @@ QDBusPendingReply<QList<quint32> > CredentialsIf::getConnectionCredentials(const
     argumentList << qVariantFromValue(service);
     return asyncCallWithArgumentList(QLatin1String("GetConnectionCredentials"), argumentList);
 }
+
+} // namespace Internal
 
 } // namespace MssfQt
