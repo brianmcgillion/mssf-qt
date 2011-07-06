@@ -34,4 +34,12 @@
 #  define MSSFQTSHARED_EXPORT Q_DECL_IMPORT
 #endif
 
+/**
+  \mainpage The MSSF-qt documentation
+
+  This library contains Qt wrappers for some Mobile Simplified Security
+ Framework components: certman, libcreds and crypto API.
+*/
+
+
 #endif // MSSF_GLOBAL_H
