@@ -23,6 +23,16 @@
  * libraries remain with their original authors.
  */
 
+/**
+  \mainpage The MSSF-Qt documentation
+
+  This library contains Qt wrappers for some <a href="http://meego.gitorious.org/meego-platform-security">Mobile Simplified Security Framework</a> components:
+    \li <a href="../../maemosec-certman-doc/html/index.html">certman</a> - accessing certificate stores (\ref MssfQt::MssfCertman "MssfCertman"),
+    \li <a href="../../libcreds2-doc/html/index.html">libcreds2</a> - credentials handling library (\ref MssfQt::CredentialsManager "CredentialsManager" and \ref MssfQt::DBusContextAccessManager "DBusContextAccessManager")
+    \li <a href="../../aegis-crypto-doc/index.html">crypto</a> - basic cryptographic functions (\ref MssfQt::MssfCrypto "MssfCrypto", \ref MssfQt::MssfStorage "MssfStorage").
+
+*/
+
 #ifndef MSSFQT_GLOBAL_H
 #define MSSFQT_GLOBAL_H
 
@@ -33,13 +43,5 @@
 #else
 #  define MSSFQTSHARED_EXPORT Q_DECL_IMPORT
 #endif
-
-/**
-  \mainpage The MSSF-qt documentation
-
-  This library contains Qt wrappers for some Mobile Simplified Security
- Framework components: certman, libcreds and crypto API.
-*/
-
 
 #endif // MSSF_GLOBAL_H
