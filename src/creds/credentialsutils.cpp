@@ -24,6 +24,7 @@
  */
 
 #include "credentialsutils.h"
+#include "credentialsif.h"
 
 #ifdef MAEMO
 #include <sys/creds.h>
@@ -33,6 +34,12 @@
 
 #include <errno.h>
 #include <limits.h>
+
+#include <QtCore/QList>
+#include <QtCore/QVector>
+#include <QtCore/QScopedPointer>
+#include <QtDBus/QDBusPendingReply>
+#include <QtCore/QDebug>
 
 namespace MssfQt
 {
@@ -45,8 +52,19 @@ CredentialsUtils::~CredentialsUtils()
 {
 }
 
-quint32 CredentialsUtils::stringToCreds(const QString &name, QString *errorString)
+bool CredentialsUtils::setLastError(const QString &errorStr, QString *returnString)
 {
+    if (!returnString)
+        return false;
+
+    returnString->clear();
+    returnString->append(errorStr);
+    return false;
+}
+
+CredentialsUtils::Credential CredentialsUtils::stringToCreds(const QString &name, QString *errorString)
+{
+    Credential cred;
     creds_type_t type;
     creds_value_t value;
 
@@ -59,21 +77,72 @@ quint32 CredentialsUtils::stringToCreds(const QString &name, QString *errorStrin
         setLastError(QString(QLatin1String("Invalid credential string (%1), errno (%2) : %3"))
                      .arg(name).arg(errno).arg(strerror_r(errno, strErrArray, sizeof(strErrArray))),
                      errorString);
-        value = UINT_MAX;
     }
-    //qDebug("Type %x value %d", (int)type, (int)value);
+    qDebug("Type %x value %ld", type, value);
 
-    return value;
+    cred.first = type;
+    cred.second = value;
+
+    return cred;
 }
 
-bool CredentialsUtils::setLastError(const QString &errorStr, QString *returnString)
+QString CredentialsUtils::credsToString(const Credential &cred, QString *errorStr)
 {
-    if (!returnString)
-        return false;
+    Q_UNUSED(errorStr)
 
-    returnString->clear();
-    returnString->append(errorStr);
-    return false;
+    char str[512];
+    creds_creds2str(cred.first, cred.second, str, sizeof(str));
+
+    return QString::fromAscii(str);
+}
+
+QList<CredentialsUtils::Credential> CredentialsUtils::getClientCredentialsList(const QDBusContext &context, QString *errorString)
+{
+    QString serviceName = context.message().service();
+
+    QScopedPointer<Internal::CredentialsIf> credsIf(new Internal::CredentialsIf());
+    QDBusPendingReply<QList<quint32> > reply;
+    reply = credsIf->getConnectionCredentials(serviceName);
+    reply.waitForFinished();
+    if (!reply.isValid())
+    {
+        CredentialsUtils::setLastError(reply.error().message(), errorString);
+        return QList<CredentialsUtils::Credential>();
+    }
+
+    QList<quint32> result = reply.value();
+    QVector<quint32> resultVector = result.toVector();
+
+    creds_t creds = creds_import(resultVector.constData(), resultVector.count());
+    if (creds == 0)
+    {
+        CredentialsUtils::setLastError(QLatin1String("Unsuccesful credentials import"), errorString);
+        return QList<CredentialsUtils::Credential>();
+    }
+
+    QList<CredentialsUtils::Credential> list;
+    int i = 0;
+    while (i >= 0)
+    {
+        creds_type_t type;
+        creds_value_t value;
+        type = creds_list(creds, i, &value);
+        i++;
+        if (type == CREDS_BAD)
+            break;
+
+        Credential add;
+        add.first = type;
+        add.second = value;
+        list.append(add);
+
+        qDebug("cred %x type %ld value", add.first, add.second);
+    }
+    qDebug("%d items", list.count());
+
+    creds_free(creds);
+
+    return list;
 }
 
 } // namespace MssfQt

@@ -37,6 +37,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QSet>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QDebug>
 
 using namespace MssfQt;
 
@@ -66,23 +67,25 @@ bool DBusContextAccessManager::hasClientCredentials(const QDBusContext &context,
     if (errorString)
         errorString->clear();
 
-    QSet<quint32> creds;
+    QSet<CredentialsUtils::Credential> creds;
 
     foreach(const QString &str, credentialList)
     {
-        quint32 id = CredentialsUtils::stringToCreds(str, errorString);
+        CredentialsUtils::Credential id = CredentialsUtils::stringToCreds(str, errorString);
         if (errorString && !errorString->isEmpty())
             return false;
 
         creds.insert(id);
     }
 
-    QSet<quint32> list = getClientCredentialsList(context, errorString).toSet();
+    QSet<CredentialsUtils::Credential> list = CredentialsUtils::getClientCredentialsList(context, errorString).toSet();
     if (errorString && !errorString->isEmpty())
         return false;
 
     bool exist = list.contains(creds);
-    //qDebug("creds %d items, list %d items, exits %d", creds.count(), list.count(), (int)exist);
+    qDebug("creds %d items, list %d items, exits %d", creds.count(), list.count(), (int)exist);
+
+    peerCredentials(context);
 
     return exist;
 }
@@ -114,21 +117,29 @@ quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &cont
     return result;
 }
 
-QList<quint32> DBusContextAccessManager::getClientCredentialsList(const QDBusContext &context, QString *errorString)
+QStringList DBusContextAccessManager::peerCredentials(const QDBusContext &context, QString *errorString)
 {
-    QString serviceName = context.message().service();
+    if (errorString)
+        errorString->clear();
 
-    QScopedPointer<Internal::CredentialsIf> credsIf(new Internal::CredentialsIf());
-    QDBusPendingReply<QList<quint32> > reply;
-    reply = credsIf->getConnectionCredentials(serviceName);
-    reply.waitForFinished();
-    if (!reply.isValid())
+    QList<CredentialsUtils::Credential> list = CredentialsUtils::getClientCredentialsList(context, errorString);
+
+    // if error - do nothing, just return
+    if (errorString && !errorString->isEmpty())
+        return QStringList();
+
+    QStringList result;
+
+    foreach(const CredentialsUtils::Credential &cred, list)
     {
-        CredentialsUtils::setLastError(reply.error().message(), errorString);
-        return QList<quint32>();
+        QString str = CredentialsUtils::credsToString(cred, errorString);
+        if (errorString && !errorString->isEmpty())
+            continue;
+
+        result.append(str);
     }
 
-    QList<quint32> result = reply.value();
+    qDebug() << result;
 
     return result;
 }

@@ -27,6 +27,9 @@
 #define CREDENTIALSUTILS_H
 
 #include <QtCore/QString>
+#include <QtCore/QPair>
+
+QT_FORWARD_DECLARE_CLASS(QDBusContext)
 
 namespace MssfQt
 {
@@ -37,13 +40,23 @@ public:
     CredentialsUtils();
     virtual ~CredentialsUtils();
 
+    typedef QPair<int, long> Credential;
+
     /*!
       * \brief Convert credential string \a name to a value
       * \param name Credential name
       * \param errorStr The latest error string.
-      * \returns Credential value, UINT_MAX in case of error
+      * \returns Credential value
       */
-    static quint32 stringToCreds(const QString &name, QString *errorStr = 0);
+    static Credential stringToCreds(const QString &name, QString *errorStr = 0);
+
+    /*!
+      * \brief Convert credential to a string
+      * \param cred Credential
+      * \param errorStr The latest error string.
+      * \returns Credential name
+      */
+    static QString credsToString(const Credential &cred, QString *errorStr = 0);
 
     /*!
       * \brief Set the error string for the applciation.
@@ -52,6 +65,15 @@ public:
       * \returns false This is a convenience so that we can just "return setLastError("Bla")"
       */
     static bool setLastError(const QString &errorStr, QString *returnString);
+
+    /*!
+      * \brief Determine the calling process's Credentials based on the DBus context.
+      * \param context The QDBusContext that is handling the client request.
+      * \param errorString An empty string that will be populated with the most recent error if needed
+      * \returns The credentials list of the client DBus connection.
+      * \sa QDBusContext
+      */
+    static QList<Credential> getClientCredentialsList(const QDBusContext &context, QString *errorString = 0);
 };
 
 } // namespace MssfQt

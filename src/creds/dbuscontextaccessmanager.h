@@ -99,7 +99,7 @@ public:
       * \returns The credentials list of the client DBus connection.
       * \sa QDBusContext
       */
-    static QList<quint32> getClientCredentialsList(const QDBusContext &context, QString *errorString = 0);
+    static QStringList peerCredentials(const QDBusContext &context, QString *errorString = 0);
 
     /*!
       * \brief Determine if a dbus client has the required credentials and access rights.
