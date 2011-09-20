@@ -83,9 +83,10 @@ bool DBusContextAccessManager::hasClientCredentials(const QDBusContext &context,
         return false;
 
     bool exist = list.contains(creds);
-    qDebug("creds %d items, list %d items, exits %d", creds.count(), list.count(), (int)exist);
+    //qDebug("creds %d items, list %d items, exits %d", creds.count(), list.count(), (int)exist);
 
-    peerCredentials(context);
+    // debug output
+    //peerCredentials(context);
 
     return exist;
 }
@@ -139,7 +140,7 @@ QStringList DBusContextAccessManager::peerCredentials(const QDBusContext &contex
         result.append(str);
     }
 
-    qDebug() << result;
+    //qDebug() << result;
 
     return result;
 }

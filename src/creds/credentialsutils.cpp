@@ -78,7 +78,7 @@ CredentialsUtils::Credential CredentialsUtils::stringToCreds(const QString &name
                      .arg(name).arg(errno).arg(strerror_r(errno, strErrArray, sizeof(strErrArray))),
                      errorString);
     }
-    qDebug("Type %x value %ld", type, value);
+    //qDebug("Type %x value %ld", type, value);
 
     cred.first = type;
     cred.second = value;
@@ -136,9 +136,9 @@ QList<CredentialsUtils::Credential> CredentialsUtils::getClientCredentialsList(c
         add.second = value;
         list.append(add);
 
-        qDebug("cred %x type %ld value", add.first, add.second);
+        //qDebug("cred %x type %ld value", add.first, add.second);
     }
-    qDebug("%d items", list.count());
+    //qDebug("%d items", list.count());
 
     creds_free(creds);
 
