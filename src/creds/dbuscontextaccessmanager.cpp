@@ -34,8 +34,9 @@
 #include <QtDBus/QDBusConnectionInterface>
 #include <QtDBus/QDBusContext>
 #include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QSet>
 #include <QtCore/QScopedPointer>
-#include <QtCore/QDebug>
 
 using namespace MssfQt;
 
@@ -45,29 +46,50 @@ DBusContextAccessManager::DBusContextAccessManager()
 
 DBusContextAccessManager::~DBusContextAccessManager()
 {
-
 }
 
 bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, const QString &access, QString *errorString)
 {
-    //! \todo implement support for \a access later
-    Q_UNUSED(access);
-
-    quint32 cred = CredentialsUtils::stringToCreds(credential, errorString);
-    if (errorString && !errorString->isEmpty())
-        return false;
-
-    QList<quint32> list = getClientCredentialsList(context);
-
-    bool exist = list.contains(cred);
-    qDebug("cred %u, list %d items, exits %d", cred, list.count(), (int)exist);
-
-    return exist;
+    return hasClientCredentials(context, QStringList() << credential, access, errorString);
 }
 
 bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, QString *errorString)
 {
-    return DBusContextAccessManager::hasClientCredential(context, credential, QString(), errorString);
+    return hasClientCredential(context, credential, QString(), errorString);
+}
+
+bool DBusContextAccessManager::hasClientCredentials(const QDBusContext &context, const QStringList &credentialList, const QString &access, QString *errorString)
+{
+    //! \todo implement support for \a access later
+    Q_UNUSED(access);
+
+    if (errorString)
+        errorString->clear();
+
+    QSet<quint32> creds;
+
+    foreach(const QString &str, credentialList)
+    {
+        quint32 id = CredentialsUtils::stringToCreds(str, errorString);
+        if (errorString && !errorString->isEmpty())
+            return false;
+
+        creds.insert(id);
+    }
+
+    QSet<quint32> list = getClientCredentialsList(context, errorString).toSet();
+    if (errorString && !errorString->isEmpty())
+        return false;
+
+    bool exist = list.contains(creds);
+    //qDebug("creds %d items, list %d items, exits %d", creds.count(), list.count(), (int)exist);
+
+    return exist;
+}
+
+bool DBusContextAccessManager::hasClientCredentials(const QDBusContext &context, const QStringList &credentialList, QString *errorString)
+{
+    return hasClientCredentials(context, credentialList, QString(), errorString);
 }
 
 quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &context)
@@ -92,7 +114,7 @@ quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &cont
     return result;
 }
 
-QList<quint32> DBusContextAccessManager::getClientCredentialsList(const QDBusContext &context)
+QList<quint32> DBusContextAccessManager::getClientCredentialsList(const QDBusContext &context, QString *errorString)
 {
     QString serviceName = context.message().service();
 
@@ -101,7 +123,10 @@ QList<quint32> DBusContextAccessManager::getClientCredentialsList(const QDBusCon
     reply = credsIf->getConnectionCredentials(serviceName);
     reply.waitForFinished();
     if (!reply.isValid())
+    {
+        CredentialsUtils::setLastError(reply.error().message(), errorString);
         return QList<quint32>();
+    }
 
     QList<quint32> result = reply.value();
 

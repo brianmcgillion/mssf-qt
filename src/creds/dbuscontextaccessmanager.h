@@ -36,6 +36,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QDBusContext)
 QT_FORWARD_DECLARE_CLASS(QString)
+QT_FORWARD_DECLARE_CLASS(QStringList)
 
 namespace MssfQt
 {
@@ -94,10 +95,37 @@ public:
     /*!
       * \brief Determine the calling process's Credentials based on the DBus context.
       * \param context The QDBusContext that is handling the client request.
+      * \param errorString An empty string that will be populated with the most recent error if needed
       * \returns The credentials list of the client DBus connection.
       * \sa QDBusContext
       */
-    static QList<quint32> getClientCredentialsList(const QDBusContext &context);
+    static QList<quint32> getClientCredentialsList(const QDBusContext &context, QString *errorString = 0);
+
+    /*!
+      * \brief Determine if a dbus client has the required credentials and access rights.
+      * \param context The local DBus context that is handling the client connection.
+      * \param credentialList The credential list that the client must possess.
+      * \param access The access type requested to the object.
+      * \param errorString An empty string that will be populated with the most recent error if this method returns false.
+      * \returns true if the client has the required credential, false otherwise.
+      * \sa QDBusContext
+      *
+      * Examples of access_type valid strings: "r", "w", "rw", "a", "ra", "wa", "x", "rwx", and etc.
+      * If an empty string is supplied, then access is assumed to be "rw".
+      */
+    static bool hasClientCredentials(const QDBusContext &context, const QStringList &credentialList, const QString &access, QString *errorString = 0);
+
+    /*!
+      * \brief Determine if a dbus client has the required credentials.
+      * \param context The local DBus context that is handling the client connection.
+      * \param credentialList The credential list that the client must possess.
+      * \param errorString An empty string that will be populated with the most recent error if this method returns false.
+      * \returns true if the client has the required credential, false otherwise.
+      * \sa QDBusContext
+      *
+      * In Mssf V2 this method assumes checking 'rw' access with the token, in V1 possession of the token is sufficient to grant all access.
+      */
+    static bool hasClientCredentials(const QDBusContext &context, const QStringList &credentialList, QString *errorString = 0);
 
     /*!
       * \brief Determine the calling process's PID based on the DBus context.

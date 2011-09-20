@@ -61,6 +61,7 @@ quint32 CredentialsUtils::stringToCreds(const QString &name, QString *errorStrin
                      errorString);
         value = UINT_MAX;
     }
+    //qDebug("Type %x value %d", (int)type, (int)value);
 
     return value;
 }
