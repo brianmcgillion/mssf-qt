@@ -15,7 +15,8 @@ maemo {
 SOURCES += \
     dbuscontextaccessmanager.cpp \
     credentialsmanager.cpp \
-    credentialsif.cpp
+    credentialsif.cpp \
+    credentialsutils.cpp
 
 PUBLIC_HEADERS +=\
     dbuscontextaccessmanager.h \
@@ -24,9 +25,12 @@ PUBLIC_HEADERS +=\
     CredentialsManager
 
 HEADERS += $$PUBLIC_HEADERS \
-    credentialsif.h
+    credentialsif.h \
+    credentialsutils.h
 
 include(../install.pri)
+
+
 
 
 

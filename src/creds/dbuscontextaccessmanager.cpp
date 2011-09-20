@@ -27,6 +27,7 @@
 #include "dbuscontextaccessmanager.h"
 #include "credentialsmanager.h"
 #include "credentialsif.h"
+#include "credentialsutils.h"
 
 #include <QtDBus/QDBusMessage>
 #include <QtDBus/QDBusConnection>
@@ -34,6 +35,7 @@
 #include <QtDBus/QDBusContext>
 #include <QtCore/QString>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QDebug>
 
 using namespace MssfQt;
 
@@ -48,12 +50,24 @@ DBusContextAccessManager::~DBusContextAccessManager()
 
 bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, const QString &access, QString *errorString)
 {
-    return CredentialsManager::hasProcessCredential(getClientPID(context), credential, access, errorString);
+    //! \todo implement support for \a access later
+    Q_UNUSED(access);
+
+    quint32 cred = CredentialsUtils::stringToCreds(credential, errorString);
+    if (errorString && !errorString->isEmpty())
+        return false;
+
+    QList<quint32> list = getClientCredentialsList(context);
+
+    bool exist = list.contains(cred);
+    qDebug("cred %u, list %d items, exits %d", cred, list.count(), (int)exist);
+
+    return exist;
 }
 
 bool DBusContextAccessManager::hasClientCredential(const QDBusContext &context, const QString &credential, QString *errorString)
 {
-    return CredentialsManager::hasProcessCredential(getClientPID(context), credential, errorString);
+    return DBusContextAccessManager::hasClientCredential(context, credential, QString(), errorString);
 }
 
 quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &context)
@@ -74,6 +88,22 @@ quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &cont
     quint32 *result = new quint32[list.count()];
     for(int i = 0; i < list.count(); i++)
         result[i] = list[i];
+
+    return result;
+}
+
+QList<quint32> DBusContextAccessManager::getClientCredentialsList(const QDBusContext &context)
+{
+    QString serviceName = context.message().service();
+
+    QScopedPointer<Internal::CredentialsIf> credsIf(new Internal::CredentialsIf());
+    QDBusPendingReply<QList<quint32> > reply;
+    reply = credsIf->getConnectionCredentials(serviceName);
+    reply.waitForFinished();
+    if (!reply.isValid())
+        return QList<quint32>();
+
+    QList<quint32> result = reply.value();
 
     return result;
 }

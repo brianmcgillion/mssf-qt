@@ -24,6 +24,7 @@
  */
 
 #include "credentialsmanager.h"
+#include "credentialsutils.h"
 
 #include <string.h>
 #include <errno.h>
@@ -38,20 +39,9 @@
 
 using namespace MssfQt;
 
-/*!
-  * \brief Set the error string for the applciation.
-  * \param errorStr The latest error string.
-  * \param returnString The error string to be returned
-  * \returns false This is a convenience so that we can just "return setLastError("Bla")"
-  */
 static bool setLastError(const QString &errorStr, QString *returnString)
 {
-    if (!returnString)
-        return false;
-
-    returnString->clear();
-    returnString->append(errorStr);
-    return false;
+    return CredentialsUtils::setLastError(errorStr, returnString);
 }
 
 /*!
@@ -68,7 +58,7 @@ static bool hasCredential(creds_t creds, const QString &credential, const QStrin
     creds_value_t value;
     char strErrArray[256];
 
-    if ((type = creds_str2creds(credential.toUtf8().data(), &value)) == CREDS_BAD)
+    if ((type = creds_str2creds(credential.toUtf8().constData(), &value)) == CREDS_BAD)
     {
         creds_free(creds);
         return setLastError(QString("Invalid credential string (%1), errno (%2) : %3")

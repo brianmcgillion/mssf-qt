@@ -1,7 +1,7 @@
 /*
  * This file is part of MSSF
  *
- * Copyright (C) 2011 Brian McGillion
+ * Copyright (C) 2011 Brian McGillion, Denis Mingulov
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public License
@@ -17,7 +17,8 @@
  * Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
  * 02110-1301 USA
  *
- * Author: Brian McGillion <brian.mcgillion@symbio.com>
+ * Authors: Brian McGillion <brian.mcgillion@symbio.com>,
+ *          Denis Mingulov <denis.mingulov@symbio.com>
  *
  * This is a wrapper library to provide a Qt API.  All rights for the wrapped
  * libraries remain with their original authors.
@@ -31,8 +32,10 @@
 #include <unistd.h>
 #include <sys/types.h>
 
-class QDBusContext;
-class QString;
+#include <QtCore/QList>
+
+QT_FORWARD_DECLARE_CLASS(QDBusContext)
+QT_FORWARD_DECLARE_CLASS(QString)
 
 namespace MssfQt
 {
@@ -87,6 +90,14 @@ public:
       * \sa QDBusContext
       */
     static quint32 *getClientCredentials(const QDBusContext &context);
+
+    /*!
+      * \brief Determine the calling process's Credentials based on the DBus context.
+      * \param context The QDBusContext that is handling the client request.
+      * \returns The credentials list of the client DBus connection.
+      * \sa QDBusContext
+      */
+    static QList<quint32> getClientCredentialsList(const QDBusContext &context);
 
     /*!
       * \brief Determine the calling process's PID based on the DBus context.
