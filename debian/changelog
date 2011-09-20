@@ -1,3 +1,10 @@
+mssf-qt (0.0.9) unstable; urgency=low
+
+  * Fixes: NB#261706 - [mssf-qt] DBusContextAccessManager::hasClientCredential uses creds_gettask to check dbus call creds
+  * Fixes: NB#258159 - [mssf-qt] DBusContextAccessManager API Needs Improvement
+
+ -- Denis Mingulov <ext-denis.1.mingulov@nokia.com>  Tue, 20 Sep 2011 03:00:00 +0300
+
 mssf-qt (0.0.8) unstable; urgency=low
 
   * Fixes: NB#266838 - Missing introduction api document
