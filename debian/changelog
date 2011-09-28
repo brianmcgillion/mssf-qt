@@ -1,3 +1,9 @@
+mssf-qt (0.1.0) unstable; urgency=low
+
+  * Fixes: NB#281989 - Fixes to Crypto services
+
+ -- Denis Mingulov <ext-denis.1.mingulov@nokia.com>  Wed, 28 Sep 2011 09:20:00 +0300
+
 mssf-qt (0.0.9) unstable; urgency=low
 
   * Fixes: NB#261706 - [mssf-qt] DBusContextAccessManager::hasClientCredential uses creds_gettask to check dbus call creds
