@@ -30,6 +30,7 @@
 #include <QtCore/QPair>
 
 QT_FORWARD_DECLARE_CLASS(QDBusContext)
+QT_FORWARD_DECLARE_CLASS(QDBusMessage)
 
 namespace MssfQt
 {

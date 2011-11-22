@@ -40,6 +40,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtDBus/QDBusPendingReply>
 #include <QtCore/QDebug>
+#include <QtDBus/QDBusMessage>
 
 namespace MssfQt
 {
