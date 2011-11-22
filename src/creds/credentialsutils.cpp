@@ -98,7 +98,12 @@ QString CredentialsUtils::credsToString(const Credential &cred, QString *errorSt
 
 QList<CredentialsUtils::Credential> CredentialsUtils::getClientCredentialsList(const QDBusContext &context, QString *errorString)
 {
-    QString serviceName = context.message().service();
+    return getClientCredentialsList(context.message(), errorString);
+}
+
+QList<CredentialsUtils::Credential> CredentialsUtils::getClientCredentialsList(const QDBusMessage &message, QString *errorString)
+{
+    QString serviceName = message.service();
 
     QScopedPointer<Internal::CredentialsIf> credsIf(new Internal::CredentialsIf());
     QDBusPendingReply<QList<quint32> > reply;
@@ -144,5 +149,6 @@ QList<CredentialsUtils::Credential> CredentialsUtils::getClientCredentialsList(c
 
     return list;
 }
+
 
 } // namespace MssfQt

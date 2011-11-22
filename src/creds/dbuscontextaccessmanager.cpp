@@ -120,10 +120,16 @@ quint32 *DBusContextAccessManager::getClientCredentials(const QDBusContext &cont
 
 QStringList DBusContextAccessManager::peerCredentials(const QDBusContext &context, QString *errorString)
 {
+   return peerCredentials(context.message(), errorString);
+}
+
+
+QStringList DBusContextAccessManager::peerCredentials(const QDBusMessage &message, QString *errorString)
+{
     if (errorString)
         errorString->clear();
 
-    QList<CredentialsUtils::Credential> list = CredentialsUtils::getClientCredentialsList(context, errorString);
+    QList<CredentialsUtils::Credential> list = CredentialsUtils::getClientCredentialsList(message, errorString);
 
     // if error - do nothing, just return
     if (errorString && !errorString->isEmpty())

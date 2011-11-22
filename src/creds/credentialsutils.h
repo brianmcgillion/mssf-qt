@@ -74,6 +74,16 @@ public:
       * \sa QDBusContext
       */
     static QList<Credential> getClientCredentialsList(const QDBusContext &context, QString *errorString = 0);
+
+    /*!
+      * \overload getClientCredentialsList(const QDBusContext &context, QString *errorString = 0)
+      * \brief Determine the calling process's Credentials based on the DBus context.
+      * \param message The DBus message that has been sent by client.
+      * \param errorString An empty string that will be populated with the most recent error if needed
+      * \returns The credentials list of the client DBus connection.
+      * \sa QDBusMessage
+      */
+    static QList<Credential> getClientCredentialsList(const QDBusMessage &message, QString *errorString = 0);
 };
 
 } // namespace MssfQt

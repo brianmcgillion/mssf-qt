@@ -70,6 +70,8 @@ public:
       */
     static bool hasClientCredential(const QDBusContext &context, const QString &credential, const QString &access, QString *errorString = NULL);
 
+
+
     /*!
       * \brief Determine if a dbus client has the required credentials.
       * \param context The local DBus context that is handling the client connection.
@@ -81,6 +83,7 @@ public:
       * In Mssf V2 this method assumes checking 'rw' access with the token, in V1 possession of the token is sufficient to grant all access.
       */
     static bool hasClientCredential(const QDBusContext &context, const QString &credential, QString *errorString = NULL);
+
 
     /*!
       * \brief Determine the calling process's Credentials based on the DBus context.
@@ -100,6 +103,17 @@ public:
       * \sa QDBusContext
       */
     static QStringList peerCredentials(const QDBusContext &context, QString *errorString = 0);
+
+    /*!
+      * \overload peerCredentials(const QDBusContext &context, QString *errorString = 0)
+      * \brief Determine the calling process's Credentials based on the DBus context.
+      * \param message The DBus message that has been sent by client.
+      * \param errorString An empty string that will be populated with the most recent error if needed
+      * \returns The credentials list of the client DBus connection.
+      * \sa QDBusMessage
+      */
+    static QStringList peerCredentials(const QDBusMessage &message, QString *errorString = 0);
+
 
     /*!
       * \brief Determine if a dbus client has the required credentials and access rights.
